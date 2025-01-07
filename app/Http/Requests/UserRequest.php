@@ -26,9 +26,9 @@ class UserRequest extends FormRequest
     {
         $userId = $this->route('user');
         return [
-            'name' => 'required',
-            'email' =>'required|email|unique:users,email,' . ($userId ? $userId->id : null),
-            'password' => 'required|min:6'    
+            'name' => 'sometimes',
+            'email' =>'sometimes|email|unique:users,email,' . ($userId ? $userId->id : null),
+            'password' => 'sometimes|min:6'    
         ];
     }
 

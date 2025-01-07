@@ -30,7 +30,8 @@ class UserController extends Controller
            'users' => $user
         ],200);
     }
-    public function store(UserRequest $request) {
+    
+    public function store(UserRequest $request) : JsonResponse {
         DB::beginTransaction();
         try{
          $user = User::create([
@@ -53,4 +54,30 @@ class UserController extends Controller
             ],400);
         }
     }
+
+    public function update(UserRequest $request, User $user) : JsonResponse {
+
+        DB::beginTransaction();
+        
+        try{
+            $data = $request->only(['name', 'email', 'password']);
+
+            // Update the user with the provided data
+            $user->update($data);
+            DB::commit(); //commit into db
+
+            return response()->json([
+                'status' =>true,
+                'message' => 'User updated!',
+                'user' =>$user
+            ],200);
+        }catch(Exception $e){
+            DB::rollBack();
+            return response()->json([
+                'status' =>true,
+                'message' => 'Error!'
+            ],400);
+        }
+    }
+    
 }
