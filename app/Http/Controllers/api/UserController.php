@@ -3,17 +3,17 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UserRequest;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Js;
 
 class UserController extends Controller
 {
     public function Index(): JsonResponse {
-        $users = User::orderBy('id', 'DESC')->paginate('1');
+        $users = User::orderBy('id', 'DESC')->paginate('5');
          //paginate function parameter is the amount of entries you want to have on each page
         //?page=x X being the number of the page you want to search 
         return response()->json([
@@ -30,7 +30,7 @@ class UserController extends Controller
            'users' => $user
         ],200);
     }
-    public function store(Request $request) {
+    public function store(UserRequest $request) {
         DB::beginTransaction();
         try{
          $user = User::create([
