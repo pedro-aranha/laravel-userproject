@@ -12,14 +12,17 @@ use Illuminate\Support\Js;
 
 class UserController extends Controller
 {
-    public function Index(): JsonResponse {
-        $users = User::orderBy('id', 'DESC')->paginate('5');
+    public function Index() {
+        $users = User::orderBy('id', 'DESC')->paginate('10');
          //paginate function parameter is the amount of entries you want to have on each page
         //?page=x X being the number of the page you want to search 
-        return response()->json([
+        return view('users.index', compact('users'));
+
+     
+        /*  return response()->json([
             'status' =>true,
             'users' => $users
-        ],200);
+        ],200);*/
     }
 
 
@@ -30,14 +33,13 @@ class UserController extends Controller
            'users' => $user
         ],200);
     }
-    
-    public function store(UserRequest $request) : JsonResponse {
+    public function store(Request $request): JsonResponse {
         DB::beginTransaction();
         try{
          $user = User::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => $request->password
+                'name' => $request->user_name,
+                'email' => $request->user_email,
+                'password' => $request->user_password
             ]);
             DB::commit(); //commit into db
 
@@ -55,22 +57,18 @@ class UserController extends Controller
         }
     }
 
-    public function update(UserRequest $request, User $user) : JsonResponse {
-
+    public function deletebyId(Request $request): JsonResponse {
+        $request->validate([
+            'user_id' => 'required|integer|exists:users,id',
+        ]);
         DB::beginTransaction();
-        
         try{
-            $data = $request->only(['name', 'email', 'password']);
-
-            // Update the user with the provided data
-            $user->update($data);
+            DB::table('users')->where('id', '=', $request->user_id)->delete();
             DB::commit(); //commit into db
-
             return response()->json([
                 'status' =>true,
-                'message' => 'User updated!',
-                'user' =>$user
-            ],200);
+                'message' => 'User deleted!'
+            ],201);
         }catch(Exception $e){
             DB::rollBack();
             return response()->json([
@@ -79,5 +77,4 @@ class UserController extends Controller
             ],400);
         }
     }
-    
 }
